@@ -1,69 +1,70 @@
 # Video Processing Application
 
-A full-stack video processing application built with React (Vite) for the frontend and Node.js (Express + TypeScript) for the backend. Features include JWT-based authentication, Role-Based Access Control (RBAC), and MongoDB integration.
+Full-stack video processing application with JWT authentication, RBAC, content sensitivity analysis, video streaming, and multi-tenant architecture. Built with React (Vite), Node.js (Express + TypeScript), and MongoDB.
 
 ## 🏗️ Project Structure
 
 ```
 pulse_assessment/
-├── backend/              # Node.js + Express + TypeScript backend
+├── backend/
 │   ├── src/
-│   │   ├── config/      # Configuration files
-│   │   ├── middlewares/ # Auth, RBAC, error handling
-│   │   ├── models/      # MongoDB schemas (User, Role, Video)
-│   │   ├── modules/     # Feature modules (auth, video)
-│   │   ├── utils/       # Utility functions (JWT)
-│   │   └── server.ts    # Main server file
-│   ├── uploads/         # File uploads directory
-│   ├── package.json
-│   └── tsconfig.json
+│   │   ├── config/           # Database and app configuration
+│   │   ├── middlewares/      # Auth, RBAC, validation, error handling
+│   │   ├── models/          # MongoDB schemas (User, Role, Video, Organization)
+│   │   ├── modules/         # Feature modules (auth, video, organization)
+│   │   ├── services/        # Business logic (sensitivity, video processing)
+│   │   ├── utils/           # JWT utilities
+│   │   └── server.ts        # Express server
+│   ├── uploads/             # Local file storage
+│   └── package.json
 │
-└── frontend/            # React + Vite + TypeScript frontend
+└── frontend/
     ├── src/
-    │   ├── components/  # Reusable components
-    │   ├── context/     # React Context (Auth)
-    │   ├── pages/       # Page components
-    │   ├── services/    # API services
-    │   ├── App.tsx
+    │   ├── components/      # VideoPlayer, VideoUpload, ProtectedRoute
+    │   ├── context/         # Auth context
+    │   ├── pages/           # Login, Signup, Dashboard, Videos
+    │   ├── services/        # API services
     │   └── main.tsx
-    ├── package.json
-    └── vite.config.ts
+    └── package.json
 ```
 
 ## ✨ Features
 
 ### Backend
 
-- **Modular Architecture**: Clean separation of concerns with modules for auth and video processing
-- **JWT Authentication**: Secure token-based authentication with access and refresh tokens
-- **RBAC System**: Role-Based Access Control with permissions (admin, user, moderator, editor)
-- **MongoDB Integration**: Mongoose schemas for User, Role, and Video
-- **TypeScript**: Full type safety across the backend
-- **Middleware**: Authentication, authorization, validation, and error handling
-- **File Upload**: Multer integration for video file uploads
+- **JWT Authentication**: Access & refresh tokens with secure HTTP-only cookies
+- **RBAC System**: Roles (admin, user, moderator, editor) with granular permissions
+- **Video Upload**: Multer integration with file validation (MP4, AVI, MOV, MKV)
+- **Sensitivity Analysis**: Content moderation with sensitivity scoring and flags
+- **Video Processing**: Async processing pipeline with status tracking
+- **Video Streaming**: HLS streaming support for processed videos
+- **Multi-Tenant Architecture**: Organization-based isolation with member management
+- **Moderation System**: Approve/reject/flag videos based on sensitivity analysis
+- **MongoDB Integration**: Mongoose schemas with indexing for performance
+- **TypeScript**: Full type safety across the application
 
 ### Frontend
 
-- **React 18**: Modern React with hooks
-- **Vite**: Lightning-fast build tool
-- **TypeScript**: Full type safety
-- **Tailwind CSS**: Utility-first CSS framework
-- **React Router**: Client-side routing
-- **Auth Context**: Global authentication state management
-- **Protected Routes**: Route guards for authenticated pages
-- **Responsive Design**: Mobile-first responsive UI
+- **React 18** with TypeScript
+- **Vite**: Fast builds and hot module replacement
+- **Tailwind CSS**: Modern, responsive UI
+- **Video Player**: Custom player with sensitivity badges and moderation status
+- **Upload Interface**: Drag-and-drop with progress tracking
+- **Real-time Status**: Processing status updates and streaming availability
+- **Protected Routes**: Authentication-based route guards
+- **Responsive Design**: Mobile-first approach
 
 ## 🚀 Getting Started
 
 ### Prerequisites
 
-- Node.js (v18 or higher)
-- MongoDB (local or cloud instance)
+- Node.js v18+
+- MongoDB (local instance)
 - npm or yarn
 
 ### Backend Setup
 
-1. Navigate to the backend directory:
+1. Navigate to backend:
 
    ```bash
    cd backend
@@ -75,35 +76,45 @@ pulse_assessment/
    npm install
    ```
 
-3. Create a `.env` file (copy from `.env.example`):
+3. Create `.env` from example:
 
    ```bash
    cp .env.example .env
    ```
 
-4. Configure your environment variables in `.env`:
+4. Configure environment variables:
 
-   ```
+   ```env
    PORT=5000
    NODE_ENV=development
    MONGODB_URI=mongodb://localhost:27017/video_processing
-   JWT_SECRET=your_jwt_secret_key_here
-   JWT_REFRESH_SECRET=your_refresh_token_secret_here
+   JWT_SECRET=your_secure_secret_here
+   JWT_REFRESH_SECRET=your_refresh_secret_here
    JWT_EXPIRE=24h
    JWT_REFRESH_EXPIRE=7d
    CLIENT_URL=http://localhost:5173
    ```
 
-5. Start the development server:
+5. Seed roles:
+
+   ```bash
+   npm run seed:roles
+   ```
+
+6. Create admin user (optional):
+
+   ```bash
+   npm run create:admin
+   ```
+
+7. Start server:
    ```bash
    npm run dev
    ```
 
-The backend will run on `http://localhost:5000`
-
 ### Frontend Setup
 
-1. Navigate to the frontend directory:
+1. Navigate to frontend:
 
    ```bash
    cd frontend
@@ -115,81 +126,175 @@ The backend will run on `http://localhost:5000`
    npm install
    ```
 
-3. Create a `.env` file (copy from `.env.example`):
-
-   ```bash
-   cp .env.example .env
-   ```
-
-4. Configure your environment variables in `.env`:
-
-   ```
-   VITE_API_URL=http://localhost:5000/api
-   ```
-
-5. Start the development server:
+3. Start dev server:
    ```bash
    npm run dev
    ```
 
-The frontend will run on `http://localhost:5173`
+Frontend runs on `http://localhost:5173`
 
 ## 📚 API Documentation
 
-### Authentication Endpoints
-
-#### Register User
+### Authentication
 
 ```http
 POST /api/auth/register
-Content-Type: application/json
-
-{
-  "firstName": "John",
-  "lastName": "Doe",
-  "email": "john@example.com",
-  "password": "password123"
-}
-```
-
-#### Login
-
-```http
 POST /api/auth/login
-Content-Type: application/json
-
-{
-  "email": "john@example.com",
-  "password": "password123"
-}
-```
-
-#### Get Profile
-
-```http
-GET /api/auth/profile
-Authorization: Bearer <access_token>
-```
-
-#### Logout
-
-```http
+GET  /api/auth/profile
 POST /api/auth/logout
-Authorization: Bearer <access_token>
+POST /api/auth/refresh-token
 ```
 
-#### Refresh Token
+### Video Management
 
 ```http
-POST /api/auth/refresh-token
-Content-Type: application/json
-
-{
-  "refreshToken": "<refresh_token>"
-}
+POST   /api/videos                 # Upload video (multipart/form-data)
+GET    /api/videos                 # List all videos (paginated)
+GET    /api/videos/my-videos       # List user's videos
+GET    /api/videos/:id             # Get video details
+GET    /api/videos/:id/stream      # Get stream URL
+PUT    /api/videos/:id             # Update video
+PUT    /api/videos/:id/moderate    # Moderate video (admin)
+DELETE /api/videos/:id             # Delete video
 ```
 
-### Video Endpoints
+### Organization Management
+
+```http
+POST   /api/organizations                      # Create organization
+GET    /api/organizations                      # List user's organizations
+GET    /api/organizations/:id                  # Get organization details
+POST   /api/organizations/:id/members          # Add member
+DELETE /api/organizations/:id/members/:userId  # Remove member
+```
+
+## 🎯 Key Features Explained
+
+### Sensitivity Analysis
+
+Videos are automatically analyzed for sensitive content:
+
+- **Sensitivity Score**: 0-100 scale
+- **Content Flags**: violence, adult, offensive, sensitive
+- **Moderation Status**: pending, approved, rejected, flagged
+- Scores < 30: Auto-approved
+- Scores 30-70: Flagged for review
+- Scores > 70: Auto-rejected
+
+### Video Processing Pipeline
+
+1. **Upload**: Video uploaded via multipart form
+2. **Processing**: Async processing starts
+   - Sensitivity analysis
+   - Transcoding to HLS
+   - Thumbnail generation
+3. **Streaming**: HLS stream available after processing
+
+### Multi-Tenant Architecture
+
+Organizations provide:
+
+- Isolated video storage
+- Member management with roles
+- Custom settings (storage limits, formats)
+- Subscription-based features
+
+## 🧪 Testing
+
+### Test User Registration
+
+```bash
+curl -X POST http://localhost:5000/api/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{
+    "firstName": "Test",
+    "lastName": "User",
+    "email": "test@example.com",
+    "password": "test123"
+  }'
+```
+
+### Test Video Upload
+
+```bash
+curl -X POST http://localhost:5000/api/videos \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -F "video=@/path/to/video.mp4" \
+  -F "title=Test Video" \
+  -F "description=Test description" \
+  -F "tags=test,demo"
+```
+
+## 🏗️ Architecture Decisions
+
+### Backend
+
+- **Modular Structure**: Each feature in separate module
+- **Service Layer**: Business logic separated from controllers
+- **Async Processing**: Videos processed in background
+- **Local Storage**: All data stored locally (MongoDB + filesystem)
+
+### Frontend
+
+- **Component-Based**: Reusable components
+- **Context API**: Global auth state
+- **Service Layer**: API calls abstracted
+- **Real-time Updates**: Status polling for processing videos
+
+## 📦 Production Deployment
+
+### Environment Variables
+
+Backend `.env`:
+
+```env
+PORT=5000
+NODE_ENV=production
+MONGODB_URI=mongodb://localhost:27017/video_processing
+JWT_SECRET=strong_production_secret
+JWT_REFRESH_SECRET=strong_refresh_secret
+JWT_EXPIRE=24h
+JWT_REFRESH_EXPIRE=7d
+CLIENT_URL=https://yourdomain.com
+```
+
+### Build Commands
+
+Backend:
+
+```bash
+npm run build
+npm start
+```
+
+Frontend:
+
+```bash
+npm run build
+# Serve dist folder with nginx or similar
+```
+
+## 🔒 Security Features
+
+- JWT tokens with HTTP-only cookies
+- Password hashing with bcrypt
+- Input validation and sanitization
+- CORS configuration
+- File type validation
+- Size limits on uploads
+- Role-based access control
+
+## 📝 License
+
+MIT License
+
+## 👥 Contributing
+
+1. Fork the repository
+2. Create feature branch
+3. Commit changes
+4. Push to branch
+5. Create Pull Request
 
 #### Upload Video
 

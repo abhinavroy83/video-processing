@@ -7,19 +7,16 @@ import { config } from './config';
 import { errorHandler } from './middlewares/error.middleware';
 import authRoutes from './modules/auth/auth.routes';
 import videoRoutes from './modules/video/video.routes';
+import organizationRoutes from './modules/organization/organization.routes';
 import path from 'path';
 import fs from 'fs';
 
-// Load environment variables
 dotenv.config();
 
-// Create Express app
 const app: Application = express();
 
-// Connect to database
 connectDB();
 
-// Middleware
 app.use(cors({
     origin: config.clientUrl,
     credentials: true,
@@ -28,16 +25,13 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
-// Create uploads directory if it doesn't exist
 const uploadsDir = path.join(__dirname, '../uploads/videos');
 if (!fs.existsSync(uploadsDir)) {
     fs.mkdirSync(uploadsDir, { recursive: true });
 }
 
-// Static files
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
-// Routes
 app.get('/', (req: Request, res: Response) => {
     res.json({
         success: true,
@@ -48,8 +42,8 @@ app.get('/', (req: Request, res: Response) => {
 
 app.use('/api/auth', authRoutes);
 app.use('/api/videos', videoRoutes);
+app.use('/api/organizations', organizationRoutes);
 
-// 404 handler
 app.use((req: Request, res: Response) => {
     res.status(404).json({
         success: false,
@@ -57,10 +51,8 @@ app.use((req: Request, res: Response) => {
     });
 });
 
-// Error handler (must be last)
 app.use(errorHandler);
 
-// Start server
 const PORT = config.port;
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);

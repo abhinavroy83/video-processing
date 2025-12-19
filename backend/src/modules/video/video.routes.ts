@@ -80,4 +80,18 @@ router.delete(
     videoController.deleteVideo
 );
 
+router.get(
+    '/:id/stream',
+    authenticate,
+    authorize('video:read'),
+    videoController.streamVideo
+);
+
+router.put(
+    '/:id/moderate',
+    authenticate,
+    authorize('role:manage'),
+    videoController.moderateVideo
+);
+
 export default router;
