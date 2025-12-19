@@ -39,7 +39,6 @@ const organizationSchema = new Schema<IOrganization>(
         slug: {
             type: String,
             required: true,
-            unique: true,
             lowercase: true,
             trim: true,
         },

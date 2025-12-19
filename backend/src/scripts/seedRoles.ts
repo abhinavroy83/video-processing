@@ -1,4 +1,3 @@
-import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import { Role } from '../models/Role';
 import connectDB from '../config/database';
